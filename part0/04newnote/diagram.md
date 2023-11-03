@@ -5,21 +5,14 @@ sequenceDiagram;
     participant browser;
     participant server;
 
-    Note right of browser: The user write their note inside the input and then click on the "Save" button.;
+    Note right of browser: User write their note inside the input and clicks the save button;
 
-    browser->>browser: Javascript creates a new object that consist of the user input and the timestamp, and then stringifies it.;
-
-    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note with the body content consist of the stringified object using json content type in header;
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note with the body content consist of {"content": "some content", "date": "some date"} with ('Content-type', 'application/json') Request Header;
     activate server;
-    server->>server: Server will process the object and store it in notes array;
-    server->>browser: If the object is successfully stored, the server will send redirect(302) response to the browser to "/notes";
+    Note left of server: Server process the data and store in inside notes array;
+    server->>browser: Server sends 302 Redirect to https://studies.cs.helsinki.fi/exampleapp/notes response to the browser;
     deactivate server;
 
-    browser->>browser: Browser will redirect to "/notes"
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json;
-    activate server;
-    server->>browser: Server sends the new updated array;
-    deactivate server;
-
-    browser->>browser: Browser parses the response and then renders the updated notes;
+    browser->>browser: Browser will redirect to "/notes";
+    Note right of browser: Browser will then renders the page with the updated notes list array from the server
 ```
