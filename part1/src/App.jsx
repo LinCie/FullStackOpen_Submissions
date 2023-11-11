@@ -1,58 +1,46 @@
-const Header = (props) => {
-  return <h1>{props.course.name}</h1>;
+import { useState } from "react";
+
+const Button = (props) => {
+  return <button onClick={props.onClick}>{props.text}</button>;
 };
 
-const Part = (props) => {
+const Statistic = (props) => {
   return (
-    <p>
-      {props.name} {props.exercises}
-    </p>
+    <div>
+      <p>Good {props.reviews.good}</p>
+      <p>Neutral {props.reviews.neutral}</p>
+      <p>Bad {props.reviews.bad}</p>
+    </div>
   );
-};
-
-const Content = (props) => {
-  return (
-    <>
-      {props.course.parts.map((part) => (
-        <Part key={part.name} name={part.name} exercises={part.exercises} />
-      ))}
-    </>
-  );
-};
-
-const Footer = (props) => {
-  let numberOfExercise = 0;
-  props.course.parts.forEach((part) => {
-    numberOfExercise += part.exercises;
-  });
-
-  return <p>Number of exercises {numberOfExercise}</p>;
 };
 
 const App = () => {
-  const course = {
-    name: "Half Stack application development",
-    parts: [
-      {
-        name: "Fundamentals of React",
-        exercises: 10,
-      },
-      {
-        name: "Using props to pass data",
-        exercises: 7,
-      },
-      {
-        name: "State of a component",
-        exercises: 14,
-      },
-    ],
+  const [reviews, setReviews] = useState({ good: 0, neutral: 0, bad: 0 });
+
+  const handleClick = (review) => {
+    switch (review) {
+      case "good":
+        setReviews({ ...reviews, good: reviews.good + 1 });
+        break;
+      case "neutral":
+        setReviews({ ...reviews, neutral: reviews.neutral + 1 });
+        break;
+      case "bad":
+        setReviews({ ...reviews, bad: reviews.bad + 1 });
+        break;
+      default:
+        return;
+    }
   };
 
   return (
     <div>
-      <Header course={course} />
-      <Content course={course} />
-      <Footer course={course} />
+      <h1>Give Feedback</h1>
+      <Button onClick={() => handleClick("good")} text="good" />
+      <Button onClick={() => handleClick("neutral")} text="neutral" />
+      <Button onClick={() => handleClick("bad")} text="bad" />
+      <h1>Statistics</h1>
+      <Statistic reviews={reviews} />
     </div>
   );
 };
