@@ -4,6 +4,7 @@ const Button = (props) => {
   return <button onClick={props.onClick}>{props.text}</button>;
 };
 
+// Exercise 1.8 note. Statistic has been previously refactored
 const Statistic = (props) => {
   const { reviews } = props;
 
