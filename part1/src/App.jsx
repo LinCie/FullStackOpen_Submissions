@@ -5,11 +5,19 @@ const Button = (props) => {
 };
 
 const Statistic = (props) => {
+  const { reviews } = props;
+
+  const all = reviews.good + reviews.neutral + reviews.bad;
+  const average = (reviews.good + reviews.bad * -1) / all;
+  const positive = (reviews.good / all) * 100;
   return (
     <div>
-      <p>Good {props.reviews.good}</p>
-      <p>Neutral {props.reviews.neutral}</p>
-      <p>Bad {props.reviews.bad}</p>
+      <p>Good {reviews.good}</p>
+      <p>Neutral {reviews.neutral}</p>
+      <p>Bad {reviews.bad}</p>
+      <p>All {all}</p>
+      <p>Average {average ? average : 0}</p>
+      <p>Positive {positive ? positive : 0}%</p>
     </div>
   );
 };
