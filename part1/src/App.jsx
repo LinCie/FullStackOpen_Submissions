@@ -1,7 +1,17 @@
 import { useState } from "react";
 
+// Exercise 1.10 note. Button has been previously refactored
 const Button = (props) => {
   return <button onClick={props.onClick}>{props.text}</button>;
+};
+
+const StatisticLine = (props) => {
+  const { text, value } = props;
+  return (
+    <p>
+      {text} {value}
+    </p>
+  );
 };
 
 // Exercise 1.8 note. Statistic has been previously refactored
@@ -13,17 +23,17 @@ const Statistic = (props) => {
   const positive = (reviews.good / all) * 100;
 
   if (all === 0) {
-    return <div>No feedback given.</div>
+    return <div>No feedback given.</div>;
   }
 
   return (
     <div>
-      <p>Good {reviews.good}</p>
-      <p>Neutral {reviews.neutral}</p>
-      <p>Bad {reviews.bad}</p>
-      <p>All {all}</p>
-      <p>Average {average ? average : 0}</p>
-      <p>Positive {positive ? positive : 0}%</p>
+      <StatisticLine text="Good" value={reviews.good} />
+      <StatisticLine text="Neutral" value={reviews.neutral} />
+      <StatisticLine text="Bad" value={reviews.bad} />
+      <StatisticLine text="All" value={all} />
+      <StatisticLine text="Average" value={average} />
+      <StatisticLine text="Positive" value={positive} />
     </div>
   );
 };
