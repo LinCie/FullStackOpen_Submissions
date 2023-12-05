@@ -1,3 +1,14 @@
+const ExerciseSum = (props) => {
+  const { parts } = props;
+  let sum = 0;
+
+  parts.forEach((part) => {
+    sum += part.exercises;
+  });
+
+  return <li style={{ fontWeight: "700" }}>Total of {sum} exercises</li>;
+};
+
 const CourseItem = (props) => {
   const { courseItem } = props;
 
@@ -18,6 +29,7 @@ const Course = (props) => {
         {course.parts.map((courseItem) => (
           <CourseItem key={courseItem.id} courseItem={courseItem} />
         ))}
+        <ExerciseSum parts={course.parts} />
       </ul>
     </div>
   );
