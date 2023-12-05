@@ -1,10 +1,8 @@
 const ExerciseSum = (props) => {
   const { parts } = props;
-  let sum = 0;
-
-  parts.forEach((part) => {
-    sum += part.exercises;
-  });
+  const sum = parts.reduce((a, b) => {
+    return a + b.exercises;
+  }, 0);
 
   return <li style={{ fontWeight: "700" }}>Total of {sum} exercises</li>;
 };
