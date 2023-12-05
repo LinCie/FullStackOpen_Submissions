@@ -1,4 +1,5 @@
 import { useState } from "react";
+import _ from "lodash";
 
 const App = () => {
   const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
@@ -13,6 +14,12 @@ const App = () => {
     const newPerson = {
       name: newName,
     };
+    for (const person of persons) {
+      if (_.isEqual(newPerson, person)) { 
+        alert(`${newPerson.name} is already added to phonebook`);
+        return;
+      }
+    }
     setPersons(persons.concat(newPerson));
     setNewName("");
   };
