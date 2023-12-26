@@ -1,6 +1,55 @@
 import { useState } from "react";
 import _ from "lodash";
 
+const Search = ({ handleSearch, value }) => {
+  return (
+    <div>
+      Search For: <input onChange={handleSearch} value={value} />
+    </div>
+  );
+};
+
+const Form = ({ handleSubmit, handleInputChange, inputValue }) => {
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        Name:{" "}
+        <input
+          name="name"
+          value={inputValue.name}
+          onChange={handleInputChange}
+        />
+      </div>
+      <div>
+        Number:{" "}
+        <input
+          name="number"
+          value={inputValue.number}
+          onChange={handleInputChange}
+        />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
+};
+
+const Numbers = ({ persons, search }) => {
+  return persons.map((person) => {
+    const testName = person.name.toLowerCase();
+    if (!testName.includes(search.toLowerCase())) {
+      return null;
+    }
+
+    return (
+      <div key={person.id}>
+        {person.name} {person.number}
+      </div>
+    );
+  });
+};
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", number: "040-123456", id: 1 },
@@ -37,47 +86,22 @@ const App = () => {
     });
   };
 
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        Search For:{" "}
-        <input value={search} onChange={(e) => setSearch(e.target.value)} />
-      </div>
+      <Search handleSearch={handleSearch} value={search} />
       <h3>Add New</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          Name:{" "}
-          <input
-            name="name"
-            value={inputValue.name}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          Number:{" "}
-          <input
-            name="number"
-            value={inputValue.number}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Form
+        handleInputChange={handleInputChange}
+        handleSubmit={handleSubmit}
+        inputValue={inputValue}
+      />
       <h2>Numbers</h2>
-      {persons.map((person) => {
-        const testName = person.name.toLowerCase();
-        if (!testName.includes(search.toLowerCase())) {
-          return null;
-        }
-        return (
-          <div key={person.id}>
-            {person.name} {person.number}
-          </div>
-        );
-      })}
+      <Numbers search={search} persons={persons} />
     </div>
   );
 };
