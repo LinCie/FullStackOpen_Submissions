@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import _ from "lodash";
 
 const Search = ({ handleSearch, value }) => {
@@ -51,12 +52,7 @@ const Numbers = ({ persons, search }) => {
 };
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [inputValue, setInputValue] = useState({ name: "", number: "" });
   const [search, setSearch] = useState("");
 
@@ -89,6 +85,21 @@ const App = () => {
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/persons");
+      if (response.data) {
+        setPersons(response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div>
