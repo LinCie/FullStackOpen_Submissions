@@ -16,19 +16,14 @@
       "id": 3
     },
     {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
+      "name": "Boe Jiden",
+      "number": "123-456-789",
       "id": 4
     },
     {
-      "name": "Michael",
-      "number": "123-456-789",
-      "id": 5
-    },
-    {
-      "name": "Trevor",
+      "name": "Tronald Dump",
       "number": "987-654-321",
-      "id": 6
+      "id": 5
     }
   ]
 }
