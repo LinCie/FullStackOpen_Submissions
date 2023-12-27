@@ -43,3 +43,17 @@ export const deleteNumber = async (id) => {
     throw err;
   }
 };
+
+export const updateNumber = async (id, number) => {
+  try {
+    const response = await axios.put(`${baseUrl}/persons/${id}`, number);
+    if (response.data) {
+      return response.data;
+    } else {
+      throw new Error("Failed to update data");
+    }
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};

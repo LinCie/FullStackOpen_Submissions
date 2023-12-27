@@ -1,6 +1,11 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import _ from "lodash";
-import { getNumbers, addNumber, deleteNumber } from "./services/numbers";
+import {
+  getNumbers,
+  addNumber,
+  deleteNumber,
+  updateNumber,
+} from "./services/numbers";
 
 const Search = ({ handleSearch, value }) => {
   return (
@@ -101,16 +106,35 @@ const App = () => {
     };
 
     for (const person of persons) {
-      if (_.isEqual(newPerson, person)) {
-        alert(`${newPerson.name} is already added to phonebook`);
-        return;
+      if (
+        newPerson.name.toLowerCase() === person.name.toLowerCase() &&
+        window.confirm(
+          `${newPerson.name} is already in the phonebook. Replace the old phone number with new one?`
+        )
+      ) {
+        try {
+          const response = await updateNumber(person.id, newPerson);
+          const tempPersons = persons.map((p) => {
+            if (p.id === response.id) {
+              return response;
+            } else {
+              return p;
+            }
+          });
+
+          setPersons(tempPersons);
+        } catch (err) {
+          alert("Errow when updating number");
+        } finally {
+          return;
+        }
       }
     }
 
     try {
-      await addNumber(newPerson);
+      const response = await addNumber(newPerson);
 
-      setPersons(persons.concat(newPerson));
+      setPersons(persons.concat(response));
       setInputValue({
         name: "",
         number: "",
@@ -126,9 +150,9 @@ const App = () => {
 
   const fetchData = async () => {
     try {
-      const data = await getNumbers();
-      if (data) {
-        setPersons(data);
+      const response = await getNumbers();
+      if (response) {
+        setPersons(response);
       }
     } catch (err) {
       alert("Error when getting data the from database");
