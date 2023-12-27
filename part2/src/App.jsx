@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import _ from "lodash";
+import { getNumbers, addNumber } from "./services/numbers";
 
 const Search = ({ handleSearch, value }) => {
   return (
@@ -63,23 +63,31 @@ const App = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newPerson = {
       ...inputValue,
-      id: [...persons].pop().id + 1,
     };
+
     for (const person of persons) {
       if (_.isEqual(newPerson, person)) {
         alert(`${newPerson.name} is already added to phonebook`);
         return;
       }
     }
-    setPersons(persons.concat(newPerson));
-    setInputValue({
-      name: "",
-      number: "",
-    });
+
+    try {
+      await addNumber(newPerson);
+
+      setPersons(persons.concat(newPerson));
+      setInputValue({
+        name: "",
+        number: "",
+      });
+    } catch (err) {
+      alert("Error when adding number to database");
+    }
   };
 
   const handleSearch = (e) => {
@@ -88,12 +96,12 @@ const App = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/persons");
-      if (response.data) {
-        setPersons(response.data);
+      const data = await getNumbers();
+      if (data) {
+        setPersons(data);
       }
     } catch (err) {
-      console.log(err);
+      alert("Error when getting data the from database");
     }
   };
 

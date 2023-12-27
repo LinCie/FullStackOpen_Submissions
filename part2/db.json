@@ -19,6 +19,16 @@
       "name": "Mary Poppendieck",
       "number": "39-23-6423122",
       "id": 4
+    },
+    {
+      "name": "Michael",
+      "number": "123-456-789",
+      "id": 5
+    },
+    {
+      "name": "Trevor",
+      "number": "987-654-321",
+      "id": 6
     }
   ]
 }
