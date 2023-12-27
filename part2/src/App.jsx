@@ -7,6 +7,18 @@ import {
   updateNumber,
 } from "./services/numbers";
 
+const Message = () => {
+  const { message, error } = useContext(MessageContext);
+
+  if (!message) {
+    return null;
+  }
+
+  const isError = error ? "error" : "success";
+
+  return <div className={`message ${isError}`}>{message}</div>;
+};
+
 const Search = ({ handleSearch, value }) => {
   return (
     <div>
@@ -42,8 +54,8 @@ const Form = ({ handleSubmit, handleInputChange, inputValue }) => {
 };
 
 const DeleteButton = ({ id, name }) => {
-  const persons = useContext(PersonsContext);
-  const setPersons = useContext(SetPersonsContext);
+  const { persons, setPersons } = useContext(PersonsContext);
+  const { setMessage, setError } = useContext(MessageContext);
 
   const handleClick = async () => {
     if (
@@ -56,8 +68,12 @@ const DeleteButton = ({ id, name }) => {
 
         const newPersons = persons.filter((p) => p.id !== id);
         setPersons(newPersons);
+        setError(false);
+        setMessage(`Successfully deleted ${name} from the database!`);
       } catch (err) {
-        alert(`Error when deleting ${name} from the database`);
+        console.log(err);
+        setError(true);
+        setMessage(`Error when deleting ${name} from the database`);
       }
     }
   };
@@ -66,7 +82,7 @@ const DeleteButton = ({ id, name }) => {
 };
 
 const Numbers = ({ search }) => {
-  const persons = useContext(PersonsContext);
+  const { persons } = useContext(PersonsContext);
 
   return persons.map((person) => {
     const testName = person.name.toLowerCase();
@@ -84,12 +100,14 @@ const Numbers = ({ search }) => {
 };
 
 const PersonsContext = createContext();
-const SetPersonsContext = createContext();
+const MessageContext = createContext();
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [inputValue, setInputValue] = useState({ name: "", number: "" });
   const [search, setSearch] = useState("");
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleInputChange = (e) => {
     setInputValue({
@@ -123,8 +141,15 @@ const App = () => {
           });
 
           setPersons(tempPersons);
+          setError(false);
+          setMessage(`Successfully edited ${response.name}!`);
+          setInputValue({
+            name: "",
+            number: "",
+          });
         } catch (err) {
-          alert("Errow when updating number");
+          setError(true);
+          setMessage("Errow when updating number");
         } finally {
           return;
         }
@@ -139,8 +164,11 @@ const App = () => {
         name: "",
         number: "",
       });
+      setError(false);
+      setMessage(`Successfully added ${response.name} to the database!`);
     } catch (err) {
-      alert("Error when adding number to database");
+      setError(true);
+      setMessage("Error when adding number to database");
     }
   };
 
@@ -155,7 +183,8 @@ const App = () => {
         setPersons(response);
       }
     } catch (err) {
-      alert("Error when getting data the from database");
+      setError(true);
+      setMessage("Error when getting data the from database");
     }
   };
 
@@ -165,9 +194,12 @@ const App = () => {
 
   return (
     <div>
-      <PersonsContext.Provider value={persons}>
-        <SetPersonsContext.Provider value={setPersons}>
+      <PersonsContext.Provider value={{ persons, setPersons }}>
+        <MessageContext.Provider
+          value={{ message, setMessage, error, setError }}
+        >
           <h2>Phonebook</h2>
+          <Message />
           <Search handleSearch={handleSearch} value={search} />
           <h3>Add New</h3>
           <Form
@@ -177,7 +209,7 @@ const App = () => {
           />
           <h2>Numbers</h2>
           <Numbers search={search} />
-        </SetPersonsContext.Provider>
+        </MessageContext.Provider>
       </PersonsContext.Provider>
     </div>
   );
