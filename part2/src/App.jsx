@@ -1,216 +1,83 @@
-import { useState, useEffect, createContext, useContext } from "react";
-import _ from "lodash";
-import {
-  getNumbers,
-  addNumber,
-  deleteNumber,
-  updateNumber,
-} from "./services/numbers";
+import { useEffect, useState } from "react";
+import { getCountries } from "./services/country";
 
-const Message = () => {
-  const { message, error } = useContext(MessageContext);
-
-  if (!message) {
-    return null;
-  }
-
-  const isError = error ? "error" : "success";
-
-  return <div className={`message ${isError}`}>{message}</div>;
-};
-
-const Search = ({ handleSearch, value }) => {
+const Search = ({ value, handleSearch }) => {
   return (
     <div>
-      Search For: <input onChange={handleSearch} value={value} />
+      Search for: <input value={value ? value : ""} onChange={handleSearch} />
     </div>
   );
 };
 
-const Form = ({ handleSubmit, handleInputChange, inputValue }) => {
+const CountryInfo = ({ country }) => {
+  const languages = Object.values(country.languages);
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        Name:{" "}
-        <input
-          name="name"
-          value={inputValue.name}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div>
-        Number:{" "}
-        <input
-          name="number"
-          value={inputValue.number}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
+    <div>
+      <h1>{country.name.official}</h1>
+      {country.capital.map((capital) => {
+        return <div key={capital}>Capital: {capital}</div>;
+      })}
+      <div>Area: {country.area}</div>
+      <div>Languages:</div>
+      <ul>
+        {languages.map((lang) => (
+          <li key={lang}>{lang}</li>
+        ))}
+      </ul>
+      <img
+        src={country.flags.svg}
+        alt={`${country.name.common}'s flag`}
+        width={500}
+        height={300}
+      />
+    </div>
   );
 };
 
-const DeleteButton = ({ id, name }) => {
-  const { persons, setPersons } = useContext(PersonsContext);
-  const { setMessage, setError } = useContext(MessageContext);
-
-  const handleClick = async () => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${name} from the database?`
-      )
-    ) {
-      try {
-        await deleteNumber(id);
-
-        const newPersons = persons.filter((p) => p.id !== id);
-        setPersons(newPersons);
-        setError(false);
-        setMessage(`Successfully deleted ${name} from the database!`);
-      } catch (err) {
-        console.log(err);
-        setError(true);
-        setMessage(`Error when deleting ${name} from the database`);
-      }
-    }
-  };
-
-  return <button onClick={handleClick}>Delete</button>;
+const SearchResult = ({ countries }) => {
+  if (countries?.length === 1) {
+    return <CountryInfo country={countries[0]} />;
+  } else if (countries?.length > 10) {
+    return <div>Too many match!</div>;
+  } else {
+    return countries?.map((country) => {
+      const countryName = country.name.common;
+      return <div key={countryName}>{countryName}</div>;
+    });
+  }
 };
-
-const Numbers = ({ search }) => {
-  const { persons } = useContext(PersonsContext);
-
-  return persons.map((person) => {
-    const testName = person.name.toLowerCase();
-    if (!testName.includes(search.toLowerCase())) {
-      return null;
-    }
-
-    return (
-      <div key={person.id}>
-        {person.name} {person.number}{" "}
-        <DeleteButton id={person.id} name={person.name} />
-      </div>
-    );
-  });
-};
-
-const PersonsContext = createContext();
-const MessageContext = createContext();
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
-  const [inputValue, setInputValue] = useState({ name: "", number: "" });
-  const [search, setSearch] = useState("");
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
+  const [countries, setCountries] = useState(null);
+  const [search, setSearch] = useState(null);
+  const [searchedCountries, setSearchedCountries] = useState(null);
 
-  const handleInputChange = (e) => {
-    setInputValue({
-      ...inputValue,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const newPerson = {
-      ...inputValue,
-    };
-
-    for (const person of persons) {
-      if (
-        newPerson.name.toLowerCase() === person.name.toLowerCase() &&
-        window.confirm(
-          `${newPerson.name} is already in the phonebook. Replace the old phone number with new one?`
-        )
-      ) {
-        try {
-          const response = await updateNumber(person.id, newPerson);
-          const tempPersons = persons.map((p) => {
-            if (p.id === response.id) {
-              return response;
-            } else {
-              return p;
-            }
-          });
-
-          setPersons(tempPersons);
-          setError(false);
-          setMessage(`Successfully edited ${response.name}!`);
-          setInputValue({
-            name: "",
-            number: "",
-          });
-        } catch (err) {
-          setError(true);
-          setMessage("Errow when updating number");
-        } finally {
-          return;
-        }
-      }
-    }
-
+  const fetchCountries = async () => {
     try {
-      const response = await addNumber(newPerson);
-
-      setPersons(persons.concat(response));
-      setInputValue({
-        name: "",
-        number: "",
-      });
-      setError(false);
-      setMessage(`Successfully added ${response.name} to the database!`);
+      const response = await getCountries();
+      setCountries(response);
     } catch (err) {
-      setError(true);
-      setMessage("Error when adding number to database");
-    }
-  };
-
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const fetchData = async () => {
-    try {
-      const response = await getNumbers();
-      if (response) {
-        setPersons(response);
-      }
-    } catch (err) {
-      setError(true);
-      setMessage("Error when getting data the from database");
+      alert("Error fetching countries");
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchCountries();
   }, []);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    const temp = countries.filter((country) => {
+      const countryName = country.name.common.toLowerCase();
+      return countryName.includes(e.target.value.toLowerCase());
+    });
+    setSearchedCountries(temp);
+  };
 
   return (
     <div>
-      <PersonsContext.Provider value={{ persons, setPersons }}>
-        <MessageContext.Provider
-          value={{ message, setMessage, error, setError }}
-        >
-          <h2>Phonebook</h2>
-          <Message />
-          <Search handleSearch={handleSearch} value={search} />
-          <h3>Add New</h3>
-          <Form
-            handleInputChange={handleInputChange}
-            handleSubmit={handleSubmit}
-            inputValue={inputValue}
-          />
-          <h2>Numbers</h2>
-          <Numbers search={search} />
-        </MessageContext.Provider>
-      </PersonsContext.Provider>
+      <Search value={search} handleSearch={handleSearch} />
+      <SearchResult countries={searchedCountries} />
     </div>
   );
 };
